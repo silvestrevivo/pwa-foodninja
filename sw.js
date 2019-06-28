@@ -9,3 +9,10 @@ self.addEventListener('install', (evt) => {
 self.addEventListener('activate', (evt) => {
   console.log('serviceWorker activated')
 })
+
+// fetch event, to fetch information from the project files
+// (api, images, general info from server, etc...)
+self.addEventListener('fetch', (evt) => {
+  console.log('fetch event', evt)
+})
+//* this is necessary to install a banner in the mobile device
