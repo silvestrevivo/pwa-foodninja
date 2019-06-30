@@ -1,0 +1,22 @@
+{
+  "name": "pwa-foodninja",
+  "version": "1.0.0",
+  "description": "Basic PWA application corresponding to the YouTube Tutorial of @iamshaunjp",
+  "main": "index.html",
+  "scripts": {
+    "deploy": "gh-pages -d build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/silvestrevivo/pwa-foodninja.git"
+  },
+  "author": "@silvestrevivo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/silvestrevivo/pwa-foodninja/issues"
+  },
+  "homepage": "https://github.com/silvestrevivo/pwa-foodninja#readme",
+  "dependencies": {
+    "gh-pages": "^2.0.1"
+  }
+}
