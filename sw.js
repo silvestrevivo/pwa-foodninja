@@ -17,6 +17,18 @@ const assets = [
   '/pages/fallback.html'
 ];
 
+// we need to limit the cache size
+const limitCacheSize = (name, size) => {
+  caches.open(name).then(cache => {
+    cache.keys().then(keys => {
+      if(keys.length > size){
+        cache.delete(keys[0]).then(limitCacheSize(name, size))
+      }
+    })
+  })
+};
+
+
 // After registered, we have to install service worker
 // This is the first step in the LifeCicle
 // Any time this file changes, it gets installed again
@@ -57,11 +69,17 @@ self.addEventListener('fetch', (evt) => {
         // that means we can add dynamically new urls visited
         return caches.open(dynamicCache).then(cache => {
           cache.put(evt.request.url, fetchRes.clone());
+          //limiting the size of cache
+          limitCacheSize(dynamicCacheName, 3); // 3 is the max size we choose
           return fetchRes;
         })
       });
       // adding fallback page
-    }).catch(() => caches.match('/pages/fallback.html'))
+    }).catch(() => {
+      if(evt.request.url.indexOf('.html') > -1) {
+        return caches.match('/pages/fallback.html')
+      }
+    })
   );
 });
 //* this is necessary to install a banner in the mobile device
