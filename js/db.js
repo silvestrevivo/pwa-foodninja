@@ -1,3 +1,21 @@
+//Helper Functions
+const renderRecipe = (data, id) => {
+  const html = `
+    <div class="card-panel recipe white row" data-id=${id}>
+      <img src="/img/dish.png" alt="recipe thumb">
+      <div class="recipe-details">
+        <div class="recipe-title">${data.title}</div>
+      <div class="recipe-ingredients">${data.ingredients}</div>
+      </div>
+      <div class="recipe-delete">
+        <i class="material-icons" data-id=${id}>delete_outline</i>
+      </div>
+    </div>
+  `;
+
+  recipes.innerHTML += html;
+}
+
 // enable offline data
 // this with Firebase is easier than with other databases.
 // check solution for IndexedDB with other technologies
@@ -27,3 +45,30 @@ db.collection('recipes').onSnapshot(snapshot => {
     }
   });
 });
+
+// add new recipe
+const form = document.querySelector('form');
+form.addEventListener('submit', evt => {
+  evt.preventDefault();
+
+  const recipe = {
+    name: form.title.value,
+    ingredients: form.ingredients.value
+  };
+
+  db.collection('recipes').add(recipe)
+    .catch(err => console.log(err));
+
+  form.title.value = '';
+  form.ingredients.value = '';
+});
+
+// remove a recipe
+const recipeContainer = document.querySelector('.recipes');
+recipeContainer.addEventListener('click', evt => {
+  if(evt.target.tagName === 'I'){
+    const id = evt.target.getAttribute('data-id');
+    //console.log(id);
+    db.collection('recipes').doc(id).delete();
+  }
+})

@@ -1,6 +1,6 @@
 // Variable which works as cache fot the application
-const staticCacheName = 'site-static-v2';
-const dynamicCacheName = 'site-dynamic-v2';
+const staticCacheName = 'site-static-v5';
+const dynamicCacheName = 'site-dynamic-v5';
 
 // Assets to collect in the cache
 const assets = [
@@ -17,15 +17,15 @@ const assets = [
   '/pages/fallback.html'
 ];
 
-// we need to limit the cache size
+// cache size limit function
 const limitCacheSize = (name, size) => {
   caches.open(name).then(cache => {
     cache.keys().then(keys => {
       if(keys.length > size){
-        cache.delete(keys[0]).then(limitCacheSize(name, size))
+        cache.delete(keys[0]).then(limitCacheSize(name, size));
       }
-    })
-  })
+    });
+  });
 };
 
 
@@ -59,13 +59,12 @@ self.addEventListener('activate', (evt) => {
 
 // fetch event, to fetch information from the project files
 // (api, images, general info from server, etc...)
-self.addEventListener('fetch', (evt) => {
+self.addEventListener('fetch', evt => {
   // console.log('fetch event', evt)
 
   // we need to see if caching is necessary because FireStore
-  if(evt.request.url.indexOf('firestore.googleapis.com' === -1)) {
+  if(evt.request.url.indexOf('firestore.googleapis.com') === -1){
     evt.respondWith(
-      // eacht time we make a fecht, we check the cache
       caches.match(evt.request).then(cacheRes => {
         return cacheRes || fetch(evt.request).then(fetchRes => {
           // we manage the dynamic cache here
@@ -73,14 +72,14 @@ self.addEventListener('fetch', (evt) => {
           return caches.open(dynamicCacheName).then(cache => {
             cache.put(evt.request.url, fetchRes.clone());
             //limiting the size of cache
-            limitCacheSize(dynamicCacheName, 3); // 3 is the max size we choose
+            limitCacheSize(dynamicCacheName, 15);// 15 is the max size we choose
             return fetchRes;
           })
         });
         // adding fallback page
       }).catch(() => {
-        if(evt.request.url.indexOf('.html') > -1) {
-          return caches.match('/pages/fallback.html')
+        if(evt.request.url.indexOf('.html') > -1){
+          return caches.match('/pages/fallback.html');
         }
       })
     );
