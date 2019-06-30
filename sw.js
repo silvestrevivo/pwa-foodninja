@@ -1,5 +1,5 @@
 // Variable which works as cache fot the application
-const staticCacheName = 'site-static';
+const staticCacheName = 'site-static-v1';
 
 // Assets to collect in the cache
 const assets = [
@@ -31,6 +31,15 @@ self.addEventListener('install', evt => {
 //Activate service worker
 self.addEventListener('activate', (evt) => {
   // console.log('serviceWorker activated')
+  evt.waitUntil(
+    caches.keys().then(keys => {
+      // We manage the cache versions
+      return Promise.all(keys
+          .filter(key => key !== staticCacheName)
+          .map(key => caches.delete(key))
+        )
+    })
+  )
 });
 
 // fetch event, to fetch information from the project files
