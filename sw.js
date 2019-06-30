@@ -13,7 +13,8 @@ const assets = [
   '/css/materialize.min.css',
   '/img/dish.png',
   'https://fonts.googleapis.com/icon?family=Material+Icons',
-  'https://fonts.gstatic.com/s/materialicons/v47/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2'
+  'https://fonts.gstatic.com/s/materialicons/v47/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2',
+  '/pages/fallback.html'
 ];
 
 // After registered, we have to install service worker
@@ -36,6 +37,7 @@ self.addEventListener('activate', (evt) => {
     caches.keys().then(keys => {
       // We manage the cache versions
       return Promise.all(keys
+        // checking what page we have to catch
         .filter(key => key !== staticCacheName && key !== dynamicCacheName)
         .map(key => caches.delete(key))
       );
@@ -58,7 +60,8 @@ self.addEventListener('fetch', (evt) => {
           return fetchRes;
         })
       });
-    })
-  )
+      // adding fallback page
+    }).catch(() => caches.match('/pages/fallback.html'))
+  );
 });
 //* this is necessary to install a banner in the mobile device
