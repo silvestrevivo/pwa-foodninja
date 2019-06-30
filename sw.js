@@ -1,6 +1,6 @@
 // Variable which works as cache fot the application
-const staticCacheName = 'site-static-v5';
-const dynamicCacheName = 'site-dynamic-v5';
+const staticCacheName = 'site-static-v1';
+const dynamicCacheName = 'site-dynamic-v1';
 
 // Assets to collect in the cache
 const assets = [

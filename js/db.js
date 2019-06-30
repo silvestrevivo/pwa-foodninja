@@ -4,7 +4,7 @@ const renderRecipe = (data, id) => {
     <div class="card-panel recipe white row" data-id=${id}>
       <img src="/img/dish.png" alt="recipe thumb">
       <div class="recipe-details">
-        <div class="recipe-title">${data.title}</div>
+        <div class="recipe-title">${data.name}</div>
       <div class="recipe-ingredients">${data.ingredients}</div>
       </div>
       <div class="recipe-delete">
@@ -14,6 +14,11 @@ const renderRecipe = (data, id) => {
   `;
 
   recipes.innerHTML += html;
+}
+
+const removeRecipe = (id) => {
+  const recipe = document.querySelector(`.recipe[data-id=${id}`);
+  recipe.remove();
 }
 
 // enable offline data
@@ -30,18 +35,20 @@ db.enablePersistence()
     }
   });
 
+  console.log('test');
 
 //here comes the comunication with data base
 db.collection('recipes').onSnapshot(snapshot => {
   // console.log(snapshot.docChanges());
   snapshot.docChanges().forEach(change => {
-    //console.log(change.type, change.doc.id, change.doc.data());
+    console.log(change.type, change.doc.id, change.doc.data());
     if(change.type === 'added'){
       // add the document data to the web page
       renderRecipe(change.doc.data(), change.doc.id);
     }
     if(change.type === 'removed'){
       // remove the document data from the web page
+      removeRecipe(change.doc.id);
     }
   });
 });
