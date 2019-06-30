@@ -1,5 +1,6 @@
 // Variable which works as cache fot the application
 const staticCacheName = 'site-static-v1';
+const dynamicCache = 'site-dynamic-v1';
 
 // Assets to collect in the cache
 const assets = [
@@ -35,11 +36,11 @@ self.addEventListener('activate', (evt) => {
     caches.keys().then(keys => {
       // We manage the cache versions
       return Promise.all(keys
-          .filter(key => key !== staticCacheName)
-          .map(key => caches.delete(key))
-        )
+        .filter(key => key !== staticCacheName && key !== dynamicCacheName)
+        .map(key => caches.delete(key))
+      );
     })
-  )
+  );
 });
 
 // fetch event, to fetch information from the project files
@@ -49,7 +50,14 @@ self.addEventListener('fetch', (evt) => {
   evt.respondWith(
     // eacht time we make a fecht, we check the cache
     caches.match(evt.request).then(cacheRes => {
-      return cacheRes || fetch(evt.request);
+      return cacheRes || fetch(evt.request).then(fetchRes => {
+        // we manage the dynamic cache here
+        // that means we can add dynamically new urls visited
+        return caches.open(dynamicCache).then(cache => {
+          cache.put(evt.request.url, fetchRes.clone());
+          return fetchRes;
+        })
+      });
     })
   )
 });
