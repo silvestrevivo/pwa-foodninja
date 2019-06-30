@@ -1,6 +1,6 @@
 // Variable which works as cache fot the application
-const staticCacheName = 'site-static-v1';
-const dynamicCache = 'site-dynamic-v1';
+const staticCacheName = 'site-static-v2';
+const dynamicCacheName = 'site-dynamic-v2';
 
 // Assets to collect in the cache
 const assets = [
@@ -61,25 +61,29 @@ self.addEventListener('activate', (evt) => {
 // (api, images, general info from server, etc...)
 self.addEventListener('fetch', (evt) => {
   // console.log('fetch event', evt)
-  evt.respondWith(
-    // eacht time we make a fecht, we check the cache
-    caches.match(evt.request).then(cacheRes => {
-      return cacheRes || fetch(evt.request).then(fetchRes => {
-        // we manage the dynamic cache here
-        // that means we can add dynamically new urls visited
-        return caches.open(dynamicCache).then(cache => {
-          cache.put(evt.request.url, fetchRes.clone());
-          //limiting the size of cache
-          limitCacheSize(dynamicCacheName, 3); // 3 is the max size we choose
-          return fetchRes;
-        })
-      });
-      // adding fallback page
-    }).catch(() => {
-      if(evt.request.url.indexOf('.html') > -1) {
-        return caches.match('/pages/fallback.html')
-      }
-    })
-  );
+
+  // we need to see if caching is necessary because FireStore
+  if(evt.request.url.indexOf('firestore.googleapis.com' === -1)) {
+    evt.respondWith(
+      // eacht time we make a fecht, we check the cache
+      caches.match(evt.request).then(cacheRes => {
+        return cacheRes || fetch(evt.request).then(fetchRes => {
+          // we manage the dynamic cache here
+          // that means we can add dynamically new urls visited
+          return caches.open(dynamicCacheName).then(cache => {
+            cache.put(evt.request.url, fetchRes.clone());
+            //limiting the size of cache
+            limitCacheSize(dynamicCacheName, 3); // 3 is the max size we choose
+            return fetchRes;
+          })
+        });
+        // adding fallback page
+      }).catch(() => {
+        if(evt.request.url.indexOf('.html') > -1) {
+          return caches.match('/pages/fallback.html')
+        }
+      })
+    );
+  }
 });
 //* this is necessary to install a banner in the mobile device
